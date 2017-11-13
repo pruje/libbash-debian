@@ -12,7 +12,7 @@
 # get current_directory
 current_directory=$(dirname "$0")
 
-# test if time2backup is there
+# test if libbash is there
 if ! [ -d "$current_directory/libbash" ] ; then
 	echo "ERROR: you must put libbash sources in the libbash directory!"
 	exit 1
@@ -23,6 +23,12 @@ version=$(grep "^lb_version=" "$current_directory/libbash/libbash.sh" | head -1 
 if [ -z "$version" ] ; then
 	echo "ERROR: Cannot get libbash version!"
 	exit 1
+fi
+
+echo -n "Build debian package for libbash $version? (y/N)"
+read confirm
+if [ "$confirm" != "y" ] ; then
+	exit
 fi
 
 # create build environment
