@@ -1,8 +1,8 @@
 Package: libbash.sh
-Version: 1.6.0
+Version: 1.0.0
 Section: libs
 Priority: optional
 Architecture: all
 Depends: bash
 Maintainer: Jean Prunneaux <jean@prunneaux.com>
-Description: Bash utils
+Description: Library of useful Bash functions
