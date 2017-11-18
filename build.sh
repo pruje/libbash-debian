@@ -37,7 +37,7 @@ echo
 mkdir -p "$current_directory/build"
 if [ $? != 0 ] ; then
 	echo "ERROR while creating build directory. Please verify your access rights."
-	exit 1
+	exit 3
 fi
 
 package="$current_directory/build/package"
@@ -48,14 +48,14 @@ echo "Clean and copy package..."
 rm -rf "$package" && cp -rp "$current_directory/package" "$current_directory/build/"
 if [ $? != 0 ] ; then
 	echo "ERROR while copying package files. Please verify your access rights."
-	exit 1
+	exit 3
 fi
 
 echo "Set version number..."
 sed -i "s/^Version: .*/Version: $version/" "$package/DEBIAN/control"
 if [ $? != 0 ] ; then
-	echo "ERROR while copying package files. Please verify your access rights."
-	exit 1
+	echo "ERROR while setting the package version number."
+	exit 4
 fi
 
 echo "Copy libbash sources..."
@@ -64,15 +64,15 @@ echo "Copy libbash sources..."
 mkdir -p "$install_path/locales"
 if [ $? != 0 ] ; then
 	echo "ERROR while copying sources files. Please verify your access rights."
-	exit 1
+	exit 5
 fi
 
-# copy libbash main scripts
-for f in libbash.sh libbash_gui.sh ; do
-	cp "$current_directory/libbash.sh/$f" "$install_path"
+# copy libbash main files
+for f in libbash.sh libbash_gui.sh docs README.md LICENSE.md ; do
+	cp -r "$current_directory/libbash.sh/$f" "$install_path"
 	if [ $? != 0 ] ; then
 		echo "ERROR while copying sources files. Please verify your access rights."
-		exit 1
+		exit 5
 	fi
 done
 
@@ -81,18 +81,24 @@ for f in "$current_directory/libbash.sh/locales"/*.sh ; do
 	cp "$f" "$install_path/locales/"
 	if [ $? != 0 ] ; then
 		echo "ERROR while copying sources files. Please verify your access rights."
-		exit 1
+		exit 5
 	fi
 done
 
 echo "Set permissions..."
-chmod -R 755 "$install_path" && sudo chown -R root:root "$install_path"
+chmod -R 755 "$install_path" && \
+chmod 644 "$install_path"/*.md "$install_path"/docs/* && \
+sudo chown -R root:root "$install_path"
+if [ $? != 0 ] ; then
+	echo "... Failed!"
+	exit 6
+fi
 
 # go into the build directory
 cd "$current_directory/build"
 if [ $? != 0 ] ; then
 	echo "ERROR: Failed to go into the build directory!"
-	exit 4
+	exit 7
 fi
 
 # set archive name
@@ -103,35 +109,35 @@ echo "Generating deb package..."
 dpkg-deb --build package $archive
 if [ $? != 0 ] ; then
 	echo "...Failed!"
-	exit 5
+	exit 8
 fi
 
 # create archive directory
 mkdir -p "$version"
 if [ $? != 0 ] ; then
 	echo "ERROR: Cannot create archive directory!"
-	exit 1
+	exit 9
 fi
 
 # move archive above
 mv "$archive" "$version"
 if [ $? != 0 ] ; then
 	echo "ERROR: Failed to move the archive!"
-	exit 1
+	exit 9
 fi
 
 # going up
 cd "$version"
 if [ $? != 0 ] ; then
 	echo "ERROR: Failed to go into the archive directory!"
-	exit 4
+	exit 7
 fi
 
 echo "Generating checksum..."
 sha256sum $archive > sha256sum.txt
 if [ $? != 0 ] ; then
 	echo "...Failed!"
-	exit 6
+	exit 10
 fi
 
 echo "Clean files..."
