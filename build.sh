@@ -19,7 +19,7 @@ if ! [ -d "$current_directory/libbash.sh" ] ; then
 fi
 
 # get time2backup version
-version=$(grep "^lb_version=" "$current_directory/libbash.sh/libbash.sh" | head -1 | cut -d= -f2)
+version=$(grep "lb_version=" "$current_directory/libbash.sh/libbash.sh" | head -1 | cut -d= -f2)
 if [ -z "$version" ] ; then
 	echo "ERROR: Cannot get libbash version!"
 	exit 1
