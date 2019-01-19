@@ -5,4 +5,5 @@ Priority: optional
 Architecture: all
 Depends: bash
 Maintainer: Jean Prunneaux <jean@prunneaux.com>
+Homepage: https://github.com/pruje/libbash.sh
 Description: Library of useful Bash functions
